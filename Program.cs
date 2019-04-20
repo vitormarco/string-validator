@@ -6,9 +6,9 @@ namespace teste
     {
         static void Main(string[] args)
         {
-            ValidadorString teste = new ValidadorString();
+            ValidadorString stringIsValid = new ValidadorString();
 
-            Console.WriteLine(teste.Validar("[ (1) ]"));
+            Console.WriteLine(stringIsValid.Validar("[ { ( a ) } b c { } ( ) ]"));
         }
     }
 }

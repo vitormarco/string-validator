@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,17 +10,17 @@ namespace teste
     {
         public bool Validar(String entrada)
         {
+            bool isStringValid = true;
             bool hasNumber = Regex.IsMatch(entrada, @"\d+");
 
             String newEntrada = "";
-
-            String CHARVALID = "{}[]()";
+            String CHAR_VALID = "{}[]()";
 
             for (int i = 0; i < entrada.Length; i++)
             {
-                for (int j = 0; j < CHARVALID.Length; j++)
+                for (int j = 0; j < CHAR_VALID.Length; j++)
                 {
-                    if (entrada[i] == CHARVALID[j])
+                    if (entrada[i] == CHAR_VALID[j])
                     {
                         newEntrada += entrada[i];
                     }
@@ -30,53 +31,64 @@ namespace teste
 
             if (hasNumber || !hasAllFinishing)
             {
-                return false;
+                isStringValid = false;
             }
 
-            char toClose = ' ';
-
-            return Validar(newEntrada, 0, 1, toClose, true, 0);
-        }
-
-        private bool Validar(String entrada, int posVerify, int nextPos, char toClose, bool stringIsValid, int beforeToClose)
-        {
-
-            if (nextPos > entrada.Length - 1 && stringIsValid)
+            if (isStringValid)
             {
-                return true;
+                char toClose = ' ';
+                Queue openChar = new Queue();
+                Stack closeChar = new Stack();
+
+                for (int i = 0; i < newEntrada.Length; i++)
+                {
+                    switch (newEntrada[i])
+                    {
+                        case '{':
+                            toClose = '}';
+                            break;
+                        case '[':
+                            toClose = ']';
+                            break;
+                        case '(':
+                            toClose = ')';
+                            break;
+                        default:
+                            toClose = ' ';
+                            break;
+                    }
+
+                    char toCompare = newEntrada[i];
+
+                    if (i < newEntrada.Length - 1)
+                    {
+                        toCompare = newEntrada[i + 1];
+                    }
+
+                    if (toClose == toCompare)
+                    {
+                        i++;
+                    } else if (newEntrada[i] == '{' || newEntrada[i] == '(' || newEntrada[i] == '[')
+                    {
+                        openChar.Enqueue(toClose);
+                    } else
+                    {
+                        closeChar.Push(newEntrada[i]);
+                    }
+                }
+
+                while (openChar.Count > 0)
+                {
+                    char open = (char) openChar.Dequeue();
+                    char close = (char) closeChar.Pop();
+                    if (open != close)
+                    {
+                        isStringValid = false;
+                    }
+                }
             }
 
-
-            bool posValid = entrada[nextPos] == '{' || entrada[nextPos] == '(' || entrada[nextPos] == '[';
-
-
-            switch (entrada[posVerify])
-            {
-                case '{':
-                    toClose = '}';
-                    break;
-                case '[':
-                    toClose = ']';
-                    break;
-                case '(':
-                    toClose = ')';
-                    break;
-            }
-
-            if (entrada[nextPos] != toClose && posValid)
-            {
-                beforeToClose = posVerify;
-
-                return Validar(entrada, ++posVerify, ++nextPos, toClose, posValid, beforeToClose);
-            }
-
-            if (entrada[nextPos] == toClose && nextPos < entrada.Length)
-            {
-
-                return Validar(entrada, beforeToClose, ++nextPos, toClose, stringIsValid, beforeToClose);
-            }
-
-            return false;
+            return isStringValid;
         }
     }
 }
