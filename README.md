@@ -1,5 +1,5 @@
-# string-validator
-Pequeno testem em C# para validar string (Está com bug)
+﻿# string-validator
+Pequeno teste em C# para validar string
 
 # VALIDAÇÃO DE STRING
 
